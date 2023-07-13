@@ -2,6 +2,7 @@ const localFile = localStorage.getItem("file");
 let file = localFile || '';
 movieVideo.muted = false;
 let playTimeout;
+let movieFile;
 let subtitlesList = [];
 
 function formatTimeToSeconds(str) {
@@ -78,7 +79,8 @@ function onFileSelected(event) {
 }
 
 function onMovieSelected() {
-	const movieFile = window.URL.createObjectURL(mp4File.files[0]);
+    window.URL.revokeObjectURL(movieFile);
+	movieFile = window.URL.createObjectURL(mp4File.files[0]);
 	localStorage.setItem("movieFile", movieFile);
 	movieVideo.src = movieFile;
 }
