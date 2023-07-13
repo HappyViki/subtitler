@@ -33,7 +33,7 @@ function downloadFile() {
 }
 
 function objectifySubtitles(file) {
-	subtitlesList = file.split('\n\n').map(subtitle => {
+	subtitlesList = file.split(/\n\n+/).map(subtitle => {
 		const lines = subtitle.split('\n');
 		const start = lines[0].split(',')[0];
 		const end = lines[0].split(',')[1];
@@ -115,7 +115,6 @@ function createElementFromHTML(htmlString) {
 	var div = document.createElement('div');
 	div.innerHTML = htmlString.trim();
 
-	// Change this to div.childNodes to support multiple top-level nodes.
 	return div.firstChild;
 }
 
