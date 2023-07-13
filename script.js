@@ -120,7 +120,7 @@ function createElementFromHTML(htmlString) {
 
 function addAboveSubtitle(i) {
 	subtitlesList.splice(i, 0, {
-		start: subtitlesList[i - 1]?.end,
+		start: subtitlesList[i - 1]?.end || subtitlesList[i]?.start,
 		end: subtitlesList[i]?.start,
 		text: ''
 	});
@@ -130,7 +130,7 @@ function addAboveSubtitle(i) {
 function addBelowSubtitle(i) {
 	subtitlesList.splice(i + 1, 0, {
 		start: subtitlesList[i]?.end,
-		end: subtitlesList[i + 1]?.start,
+		end: subtitlesList[i + 1]?.start || subtitlesList[i]?.end,
 		text: ''
 	});
 	renderSubtitles();
