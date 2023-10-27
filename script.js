@@ -1,8 +1,8 @@
 const localFile = localStorage.getItem("file");
-let file = localFile || '';
-movieVideo.muted = false;
+let file = localFile || '0:00:00.000,0:00:05.000';
 let playTimeout;
 let subtitlesList = [];
+let myPlayer = videojs('movieVideo');
 
 function formatTimeToSeconds(str) {
 	const [hours, mins, secs] = str.split(":");
@@ -46,13 +46,6 @@ function objectifySubtitles(file) {
 	});
 }
 
-function renderSubtitles() {
-	const subtitles = subtitlesList.map((subtitle, i) => {
-		return subTemp(i, subtitle.start, subtitle.end, subtitle.text);
-	});
-	subtitlesContainer.innerHTML = subtitles.join('');
-}
-
 function startApp(file) {
 	objectifySubtitles(file);
 	renderSubtitles();
@@ -70,7 +63,6 @@ function onFileSelected(event) {
 	reader.onload = function (event) {
 		const file = event.target.result;
 		localStorage.setItem("file", file);
-
 		startApp(file);
 	};
 
@@ -78,33 +70,38 @@ function onFileSelected(event) {
 }
 
 function onMovieSelected() {
-	movieVideo.src = URL.createObjectURL(mp4File.files[0]);
-    movieVideo.onload = () => {
-        URL.revokeObjectURL(movieVideo.src);
-    };
+	const video = URL.createObjectURL(mp4File.files[0]);
+	myPlayer.src({
+		type: 'video/mp4',
+		src: video
+	});
+	myPlayer.onload = () => {
+		URL.revokeObjectURL(video);
+	};
 }
 
-function playClip(event) {
-	const start = formatTimeToSeconds(event.target.parentNode.parentNode.querySelector(".start").value);
-	const end = formatTimeToSeconds(event.target.parentNode.parentNode.querySelector(".end").value);
+function playClip(i) {
 
-	movieVideo.currentTime = start;
-	movieVideo.play();
+	const start = formatTimeToSeconds(subtitlesList[i].start);
+	const end = formatTimeToSeconds(subtitlesList[i].end);
+
+	myPlayer.currentTime(start);
+	myPlayer.play();
 
 	if (playTimeout) {
 		clearTimeout(playTimeout);
 	}
 
 	playTimeout = setTimeout(function () {
-		movieVideo.pause();
+		myPlayer.pause();
 	}, (end - start) * 1000);
 }
 
 function saveFile() {
 	const file = [...document.querySelectorAll(".subtitleContainer")].map(subtitle => {
-		const start = subtitle.querySelector(".start").value;
-		const end = subtitle.querySelector(".end").value;
-		const text = subtitle.querySelector(".text").value;
+		const start = subtitle.querySelector(".f-start")?.value;
+		const end = subtitle.querySelector(".f-end")?.value;
+		const text = subtitle.querySelector(".f-text")?.value;
 		return `${start},${end}\n${text}`;
 	}).join(`\n\n`);
 	result.value = file;
@@ -144,15 +141,23 @@ function deleteClip(i) {
 }
 
 function updateStart(i) {
-	subtitlesList[i].start = formatSecondsToTime(movieVideo.currentTime);
+	subtitlesList[i].start = formatSecondsToTime(myPlayer.currentTime());
 	renderSubtitles();
 	saveFile();
 }
 
 function updateEnd(i) {
-	subtitlesList[i].end = formatSecondsToTime(movieVideo.currentTime);
+	subtitlesList[i].end = formatSecondsToTime(myPlayer.currentTime());
 	renderSubtitles();
 	saveFile();
+}
+
+function renderSubtitles() {
+	subtitlesContainer.innerHTML = addTemp('addAboveSubtitle(0)');
+	const subtitles = subtitlesList.map((subtitle, i) => {
+		return (subTemp(i, subtitle.start, subtitle.end, subtitle.text) + addTemp(`addBelowSubtitle(${i})`));
+	});
+	subtitlesContainer.innerHTML += subtitles.join('');
 }
 
 sbvFile.addEventListener("change", onFileSelected);
