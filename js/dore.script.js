@@ -2999,6 +2999,7 @@ $.dore = function (element, options) {
       });
 
       // Datatable with rows
+      // TODO: columns are hard coded in, make them dynamic
       var $dataTableRows = $("#datatableRows").DataTable({
         bLengthChange: false,
         buttons: [
@@ -3012,8 +3013,6 @@ $.dore = function (element, options) {
         sDom: '<"row view-filter"<"col-sm-12"<"float-left"l><"float-right"f><"clearfix">>>t<"row view-pager"<"col-sm-12"<"text-center"ip>>>',
         pageLength: 10,
         columns: [
-          { data: "Name" },
-          { data: "Sales" },
           { data: "Stock" },
           { data: "Category" },
           { data: "Check" }

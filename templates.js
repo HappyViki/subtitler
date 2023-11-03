@@ -36,3 +36,19 @@ const subTemp = (i, start, end, text) => `<div id="sub-${i}" class="card mb-4 su
 const addTemp = (fn) => `<div class="mb-4">
 <button onclick="${fn}" type="button" class="btn btn-primary btn-block mb-1">Add</button>
 </div>`;
+
+const rowTemp = (i, title, status) => `<tr id="row-${i}">
+<td>
+    <a href="index.html"><p class="list-item-heading">${title}</p></a>
+</td>
+<td>
+    <p class="text-muted">${status}</p>
+</td>
+<td>
+    <label
+        class="custom-control custom-checkbox mb-1 align-self-center data-table-rows-check">
+        <input type="checkbox" class="custom-control-input">
+        <span class="custom-control-label">&nbsp;</span>
+    </label>
+</td>
+</tr>`;
