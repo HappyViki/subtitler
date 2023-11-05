@@ -125,12 +125,12 @@
                     <div class="card mb-4">
                         <div class="card-body">
                             <div class="position-relative mb-3">
-                                <video id="movieVideo" class="video-js card-img video-content" controls
-                                    preload="auto" poster="img/video/subpage-video-poster.jpg"
-                                    data-setup="{}">
-                                    <source
-                                        src="https://vimeo.com/1084537"
-                                        type='video/mp4'>
+                                <video 
+                                id="movieVideo" 
+                                class="video-js card-img video-content" 
+                                controls
+                                poster="img/video/subpage-video-poster.jpg"
+                                data-setup='{ "techOrder": ["youtube"], "sources": [{ "type": "video/youtube", "src": "https://www.youtube.com/watch?v=aqz-KE-bpKQ"}] }'>
                                 </video>
                             </div>
                         </div>
@@ -139,12 +139,32 @@
 
                 <div class="col-6 col-right">
                     <div class="card mb-4">
+                        <div class="card-header pl-0 pr-0">
+                            <ul class="nav nav-tabs card-header-tabs  ml-0 mr-0" role="tablist">
+                                <li class="nav-item w-50 text-center">
+                                    <a class="nav-link active" id="first-tab_" data-toggle="tab" href="#firstFull" role="tab" aria-controls="first" aria-selected="true">Link</a>
+                                </li>
+                                <li class="nav-item w-50 text-center">
+                                    <a class="nav-link" id="second-tab_" data-toggle="tab" href="#secondFull" role="tab" aria-controls="second" aria-selected="false">File</a>
+                                </li>
+                            </ul>
+                        </div>
                         <div class="card-body">
-                            <h5 class="mb-4">Load Video</h5>
-                            <label class="btn btn-outline-primary btn-upload" for="mp4File" title="Upload video file">
-                                <input type="file" class="sr-only" id="mp4File" name="video" accept=".mp4">
-                                Select File
-                            </label>
+                            <div class="tab-content">
+                                <div class="tab-pane fade show active" id="firstFull" role="tabpanel" aria-labelledby="first-tab_">
+                                    <h6 class="mb-4">Load video from YouTube link.</h6>
+                                    <div class="input-group mb-3">
+                                        <input id="videoLink" type="text" class="form-control" placeholder="YouTube Link" aria-label="YouTube" aria-describedby="basic-addon1">
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="secondFull" role="tabpanel" aria-labelledby="second-tab_">
+                                    <h6 class="mb-4">Load video from MP4 file.</h6>
+                                    <label class="btn btn-outline-primary btn-upload" for="mp4File" title="Upload video file">
+                                        <input type="file" class="sr-only" id="mp4File" name="video" accept=".mp4">
+                                        Select File
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -199,6 +219,8 @@
     <script src="js/vendor/perfect-scrollbar.min.js"></script>
     <script src="js/vendor/baguetteBox.min.js"></script>
     <script src="js/vendor/video.js"></script>
+    <!-- <script src="js/vendor/videojs-youtube.min.js"></script> -->
+    <script src="youtube.js"></script>
     <script src="js/dore.script.js"></script>
     <script src="js/scripts.js"></script>
     <script src="templates.js"></script>

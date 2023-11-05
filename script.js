@@ -1,8 +1,18 @@
+const myVideoLink = localStorage.getItem("videoLink");
 const localFile = localStorage.getItem("file");
 let file = localFile || '0:00:00.000,0:00:05.000';
 let playTimeout;
 let subtitlesList = [];
 let myPlayer = videojs('movieVideo');
+
+if (myVideoLink) {
+	videoLink.value = myVideoLink;
+
+	myPlayer.src({
+		type: 'video/youtube',
+		src: myVideoLink
+	});
+}
 
 function formatTimeToSeconds(str) {
 	const [hours, mins, secs] = str.split(":");
@@ -69,7 +79,16 @@ function onFileSelected(event) {
 	reader.readAsText(selectedFile);
 }
 
-function onMovieSelected() {
+function onVideoLinkSelected() {	
+	myPlayer.src({
+		type: 'video/youtube',
+		src: videoLink.value
+	});
+
+	localStorage.setItem("videoLink", videoLink.value);
+}
+
+function onMP4Selected() {
 	const video = URL.createObjectURL(mp4File.files[0]);
 	myPlayer.src({
 		type: 'video/mp4',
@@ -161,6 +180,7 @@ function renderSubtitles() {
 }
 
 sbvFile.addEventListener("change", onFileSelected);
-mp4File.addEventListener("change", onMovieSelected);
+videoLink.addEventListener("change", onVideoLinkSelected);
+mp4File.addEventListener("change", onMP4Selected);
 subtitlesContainer.addEventListener("change", saveFile);
 downloadBtn.addEventListener("click", downloadFile);
