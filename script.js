@@ -1,9 +1,11 @@
+const myProjectName = localStorage.getItem("projectName");
 const myVideoLink = localStorage.getItem("videoLink");
 const localFile = localStorage.getItem("file");
 let file = localFile || '0:00:00.000,0:00:05.000';
 let playTimeout;
 let subtitlesList = [];
 let myPlayer = videojs('movieVideo');
+projectName.value = myProjectName;
 
 if (myVideoLink) {
 	videoLink.value = myVideoLink;
@@ -38,7 +40,15 @@ function download(content, mimeType, filename) {
 function downloadFile() {
 	const content = localStorage.getItem("file");
 	const mimeType = "text/plain";
-	const filename = "(edited) " + sbvFile.files[0].name;
+	let filename;
+
+	if (projectName.value !== '') {
+		filename = projectName.value + ".sbv";
+	} else if (sbvFile.files[0] !== undefined) {
+		filename = "(edited) " +  sbvFile.files[0].name;
+	} else {
+		filename = "subtitles.sbv";
+	}
 	download(content, mimeType, filename);
 }
 
@@ -77,6 +87,10 @@ function onFileSelected(event) {
 	};
 
 	reader.readAsText(selectedFile);
+}
+
+function onEditProjectName() {	
+	localStorage.setItem("projectName", projectName.value);
 }
 
 function onVideoLinkSelected() {	
@@ -179,6 +193,7 @@ function renderSubtitles() {
 	subtitlesContainer.innerHTML += subtitles.join('');
 }
 
+projectName.addEventListener("change", onEditProjectName);
 sbvFile.addEventListener("change", onFileSelected);
 videoLink.addEventListener("change", onVideoLinkSelected);
 mp4File.addEventListener("change", onMP4Selected);
