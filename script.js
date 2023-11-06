@@ -133,17 +133,46 @@ function playClip(i) {
 	}, (end - start) * 1000);
 }
 
+function toWebVTT(tracks) {
+	return `WEBVTT
+
+	` + tracks.map(({start, end, text})=>{
+		return `${start} --> ${end}
+		${text}`
+	}).join(`\n\n`)
+} 
+
+function toSBV(tracks) {
+	return tracks.map(({start, end, text})=>{
+		return `${start},${end}\n${text}`
+	}).join(`\n\n`)
+}
+
 function saveFile() {
-	const file = [...document.querySelectorAll(".subtitleContainer")].map(subtitle => {
+	let tracks = [...document.querySelectorAll(".subtitleContainer")].map(subtitle => {
 		const start = subtitle.querySelector(".f-start")?.value;
 		const end = subtitle.querySelector(".f-end")?.value;
 		const text = subtitle.querySelector(".f-text")?.value;
-		return `${start},${end}\n${text}`;
-	}).join(`\n\n`);
-	result.value = file;
+		return {start, end, text};
+	});
+	result.value = toSBV(tracks);
 	items[currentProjectId] = {...items[currentProjectId], file}
 	localStorage.setItem("items", JSON.stringify(items));
-	objectifySubtitles(file);
+	subtitlesList = tracks;
+
+	let oldTracks = myPlayer.remoteTextTracks();
+	let i = oldTracks.length;
+	while (i--) {
+		myPlayer.removeRemoteTextTrack(oldTracks[i]);
+	}
+	myPlayer.addRemoteTextTrack({
+		src: `data:text/srt;base64,${btoa(toWebVTT(tracks))}`,
+		kind: "captions",
+		label: "English",
+		srclang: "en",
+		default: true,
+		mode: 'showing'
+	});
 }
 
 function createElementFromHTML(htmlString) {
