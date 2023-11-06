@@ -22,9 +22,12 @@ addProjectBtn.addEventListener("click", ()=>{
 		projectName: "",
 		videoLink: ""
 	});
-	data = JSON.stringify(items)
-	localStorage.setItem("items", data);
-	console.log(items);
-	
+	localStorage.setItem("items", JSON.stringify(items));	
 	renderRows();
 })
+
+function deleteProject(i) {
+	items.splice(i, 1)
+	localStorage.setItem("items", JSON.stringify(items));	
+	renderRows();
+}

@@ -1,18 +1,18 @@
-const myProjectName = localStorage.getItem("projectName");
-const myVideoLink = localStorage.getItem("videoLink");
-const localFile = localStorage.getItem("file");
-let file = localFile || '0:00:00.000,0:00:05.000';
+let items = JSON.parse(localStorage.getItem("items")) || [];
+let currentProjectId = localStorage.getItem("currentProjectId") || 0;
+
+let file = items[currentProjectId]?.file || '0:00:00.000,0:00:05.000';
 let playTimeout;
 let subtitlesList = [];
 let myPlayer = videojs('movieVideo');
-projectName.value = myProjectName;
+projectName.value = items[currentProjectId]?.projectName || '';
 
-if (myVideoLink) {
-	videoLink.value = myVideoLink;
+if (!!items[currentProjectId]?.videoLink) {
+	videoLink.value = items[currentProjectId].videoLink;
 
 	myPlayer.src({
 		type: 'video/youtube',
-		src: myVideoLink
+		src: items[currentProjectId].videoLink
 	});
 }
 
@@ -38,7 +38,7 @@ function download(content, mimeType, filename) {
 }
 
 function downloadFile() {
-	const content = localStorage.getItem("file");
+	const content = items[currentProjectId].file;
 	const mimeType = "text/plain";
 	let filename;
 
@@ -82,7 +82,8 @@ function onFileSelected(event) {
 
 	reader.onload = function (event) {
 		const file = event.target.result;
-		localStorage.setItem("file", file);
+		items[currentProjectId] = {...items[currentProjectId], file}
+		localStorage.setItem("items", JSON.stringify(items));
 		startApp(file);
 	};
 
@@ -90,7 +91,8 @@ function onFileSelected(event) {
 }
 
 function onEditProjectName() {	
-	localStorage.setItem("projectName", projectName.value);
+	items[currentProjectId] = {...items[currentProjectId], projectName: projectName.value}
+	localStorage.setItem("items", JSON.stringify(items));
 }
 
 function onVideoLinkSelected() {	
@@ -99,7 +101,8 @@ function onVideoLinkSelected() {
 		src: videoLink.value
 	});
 
-	localStorage.setItem("videoLink", videoLink.value);
+	items[currentProjectId] = {...items[currentProjectId], videoLink: videoLink.value}
+	localStorage.setItem("items", JSON.stringify(items));
 }
 
 function onMP4Selected() {
@@ -138,7 +141,8 @@ function saveFile() {
 		return `${start},${end}\n${text}`;
 	}).join(`\n\n`);
 	result.value = file;
-	localStorage.setItem("file", file);
+	items[currentProjectId] = {...items[currentProjectId], file}
+	localStorage.setItem("items", JSON.stringify(items));
 	objectifySubtitles(file);
 }
 
