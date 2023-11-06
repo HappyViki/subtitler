@@ -37,18 +37,16 @@ const addTemp = (fn) => `<div class="mb-4">
 <button onclick="${fn}" type="button" class="btn btn-primary btn-block mb-1">Add</button>
 </div>`;
 
-const rowTemp = (i, title, status) => `<tr id="row-${i}">
-<td>
-    <a href="index.html"><p class="list-item-heading">${title}</p></a>
-</td>
-<td>
-    <p class="text-muted">${status}</p>
-</td>
-<td>
-    <label
-        class="custom-control custom-checkbox mb-1 align-self-center data-table-rows-check">
-        <input type="checkbox" class="custom-control-input">
-        <span class="custom-control-label">&nbsp;</span>
-    </label>
-</td>
-</tr>`;
+const rowTemp = (i, title, link) => `<div id="row-${i}" class="card d-flex flex-row mb-3 active">
+<div class="d-flex flex-grow-1 min-width-zero">
+    <div class="card-body align-self-center d-flex flex-column flex-md-row justify-content-between min-width-zero align-items-md-center">
+        <button onclick="editProject(${i})" type="button" class="btn mb-0 text-primary w-15 w-xs-100">${title || "New Project"}</button>
+        <a class="list-item-heading mb-0 truncate w-40 w-xs-100" href="${link || ""}">
+            ${link || "N/A"}
+        </a>
+        <div class="w-15 w-xs-100">
+            <span class="badge badge-pill badge-secondary">In Progress</span>
+        </div>
+    </div>
+</div>
+</div>`

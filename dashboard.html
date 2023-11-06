@@ -118,18 +118,7 @@
                     <h1>Dashboard</h1>
 
                     <div class="top-right-button-container">
-                        <div class="btn-group">
-                            <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                ACTIONS
-                            </button>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" id="dataTablesCopy" href="#">Edit</a>
-                                <a class="dropdown-item" id="dataTablesExcel" href="#">Download</a>
-                                <a class="dropdown-item" id="dataTablesExcel" href="#">Done</a>
-                                <a class="dropdown-item" id="dataTablesExcel" href="#">Pending</a>
-                            </div>
-                        </div>
+                        <button id="addProjectBtn" class="btn btn-primary btn-lg mb-1" type="button">Add Project</button>
                     </div>
                     <div class="mb-2">
                         <a class="btn pt-0 pl-0 d-inline-block d-md-none" data-toggle="collapse" href="#displayOptions"
@@ -161,20 +150,8 @@
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-12 mb-4 data-table-rows data-tables-hide-filter">
-                    <table id="datatableRows" class="data-table responsive nowrap"
-                        data-order="[[ 1, &quot;desc&quot; ]]">
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Status</th>
-                                <th class="empty">&nbsp;</th>
-                            </tr>
-                        </thead>
-                        <tbody id="rowsContainer"></tbody>
-                    </table>
-                </div>
+            <div class="row mt-3">
+                <div id="rowsContainer" class="col-12 list"></div>
             </div>
         </div>
     </main>
