@@ -18,7 +18,7 @@ renderRows();
 
 addProjectBtn.addEventListener("click", ()=>{
 	items.unshift({
-		file: "",
+		subtitlesList: [],
 		projectName: "",
 		videoLink: ""
 	});

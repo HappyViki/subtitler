@@ -1,9 +1,20 @@
+import {
+	objectifySubtitles,
+	formatTimeToSeconds,
+	formatSecondsToTime,
+	toWebVTT,
+	toSBV,
+	download,
+} from './util.js';
+
+let playTimeout;
 let items = JSON.parse(localStorage.getItem("items")) || [];
 let currentProjectId = localStorage.getItem("currentProjectId") || 0;
-
-let file = items[currentProjectId]?.file || '0:00:00.000,0:00:05.000';
-let playTimeout;
-let subtitlesList = [];
+let subtitlesList = items[currentProjectId]?.subtitlesList || [{
+	start: '0:00:00.000',
+	end: '0:00:05.000',
+	text: ''
+}];
 let myPlayer = videojs('movieVideo');
 projectName.value = items[currentProjectId]?.projectName || '';
 
@@ -16,75 +27,13 @@ if (!!items[currentProjectId]?.videoLink) {
 	});
 }
 
-function formatTimeToSeconds(str) {
-	const [hours, mins, secs] = str.split(":");
-	return ((+hours * 60) + (+mins * 60) + +Number(secs));
-}
-
-function formatSecondsToTime(n) {
-	return new Date(n * 1000).toISOString().slice(12, 23);
-}
-
-/* https://stackoverflow.com/questions/3665115/how-to-create-a-file-in-memory-for-user-to-download-but-not-through-server */
-function download(content, mimeType, filename) {
-	const a = document.createElement('a');
-	const blob = new Blob([content], {
-		type: mimeType
-	});
-	const url = URL.createObjectURL(blob);
-	a.setAttribute('href', url);
-	a.setAttribute('download', filename);
-	a.click();
-}
-
-function downloadFile() {
-	const content = items[currentProjectId].file;
-	const mimeType = "text/plain";
-	let filename;
-
-	if (projectName.value !== '') {
-		filename = projectName.value + ".sbv";
-	} else if (sbvFile.files[0] !== undefined) {
-		filename = "(edited) " +  sbvFile.files[0].name;
-	} else {
-		filename = "subtitles.sbv";
-	}
-	download(content, mimeType, filename);
-}
-
-function objectifySubtitles(file) {
-	subtitlesList = file.split(/\n\n+/).map(subtitle => {
-		const lines = subtitle.split('\n');
-		const start = lines[0].split(',')[0];
-		const end = lines[0].split(',')[1];
-		const text = lines.splice(1).join('\n');
-		return {
-			start,
-			end,
-			text
-		};
-	});
-}
-
-function startApp(file) {
-	objectifySubtitles(file);
-	renderSubtitles();
-	saveFile();
-}
-
-if (file) {
-	startApp(file);
-}
-
 function onFileSelected(event) {
 	var selectedFile = event.target.files[0];
 	var reader = new FileReader();
 
 	reader.onload = function (event) {
-		const file = event.target.result;
-		items[currentProjectId] = {...items[currentProjectId], file}
-		localStorage.setItem("items", JSON.stringify(items));
-		startApp(file);
+		subtitlesList = objectifySubtitles(event.target.result);
+		renderSubtitles();
 	};
 
 	reader.readAsText(selectedFile);
@@ -116,10 +65,53 @@ function onMP4Selected() {
 	};
 }
 
-function playClip(i) {
+function saveFile() {
+	subtitlesList = [...document.querySelectorAll(".subtitleContainer")].map(subtitle => {
+		const start = subtitle.querySelector(".f-start")?.value;
+		const end = subtitle.querySelector(".f-end")?.value;
+		const text = subtitle.querySelector(".f-text")?.value;
+		return {start, end, text};
+	});
+	
+	items[currentProjectId] = {...items[currentProjectId], subtitlesList}
+	localStorage.setItem("items", JSON.stringify(items));
 
+	let oldTracks = myPlayer.remoteTextTracks();
+	let i = oldTracks.length;
+	while (i--) {
+		myPlayer.removeRemoteTextTrack(oldTracks[i]);
+	}
+	myPlayer.addRemoteTextTrack({
+		src: `data:text/srt;base64,${btoa(toWebVTT([...subtitlesList]))}`,
+		kind: "captions",
+		label: "English",
+		srclang: "en",
+		default: true,
+		mode: 'showing'
+	});
+}
+
+// Subtitles Utils
+
+const addFirstClip = () => {
+	subtitlesList.unshift({
+		start: '0:00:00.000',
+		end: subtitlesList[0]?.start || '0:00:05.000',
+		text: ''
+	});
+}
+
+const insertClip = (i) => {
+	subtitlesList.splice(i + 1, 0, {
+		start: subtitlesList[i]?.end,
+		end: subtitlesList[i + 1]?.start || subtitlesList[i]?.end || '0:00:00.000',
+		text: ''
+	});
+}
+
+const playClip = (i) => {
 	const start = formatTimeToSeconds(subtitlesList[i].start);
-	const end = formatTimeToSeconds(subtitlesList[i].end);
+	const end = formatTimeToSeconds(subtitlesList[i].end)
 
 	myPlayer.currentTime(start);
 	myPlayer.play();
@@ -133,102 +125,75 @@ function playClip(i) {
 	}, (end - start) * 1000);
 }
 
-function toWebVTT(tracks) {
-	return `WEBVTT
-
-	` + tracks.map(({start, end, text})=>{
-		return `${start} --> ${end}
-		${text}`
-	}).join(`\n\n`)
-} 
-
-function toSBV(tracks) {
-	return tracks.map(({start, end, text})=>{
-		return `${start},${end}\n${text}`
-	}).join(`\n\n`)
-}
-
-function saveFile() {
-	let tracks = [...document.querySelectorAll(".subtitleContainer")].map(subtitle => {
-		const start = subtitle.querySelector(".f-start")?.value;
-		const end = subtitle.querySelector(".f-end")?.value;
-		const text = subtitle.querySelector(".f-text")?.value;
-		return {start, end, text};
-	});
-	result.value = toSBV(tracks);
-	items[currentProjectId] = {...items[currentProjectId], file}
-	localStorage.setItem("items", JSON.stringify(items));
-	subtitlesList = tracks;
-
-	let oldTracks = myPlayer.remoteTextTracks();
-	let i = oldTracks.length;
-	while (i--) {
-		myPlayer.removeRemoteTextTrack(oldTracks[i]);
-	}
-	myPlayer.addRemoteTextTrack({
-		src: `data:text/srt;base64,${btoa(toWebVTT(tracks))}`,
-		kind: "captions",
-		label: "English",
-		srclang: "en",
-		default: true,
-		mode: 'showing'
-	});
-}
-
-function createElementFromHTML(htmlString) {
-	var div = document.createElement('div');
-	div.innerHTML = htmlString.trim();
-
-	return div.firstChild;
-}
-
-function addAboveSubtitle(i) {
-	subtitlesList.splice(i, 0, {
-		start: subtitlesList[i - 1]?.end || subtitlesList[i]?.start,
-		end: subtitlesList[i]?.start,
-		text: ''
-	});
-	renderSubtitles();
-}
-
-function addBelowSubtitle(i) {
-	subtitlesList.splice(i + 1, 0, {
-		start: subtitlesList[i]?.end,
-		end: subtitlesList[i + 1]?.start || subtitlesList[i]?.end,
-		text: ''
-	});
-	renderSubtitles();
-}
-
-function deleteClip(i) {
+const deleteClip = (i) => {
 	subtitlesList.splice(i, 1);
-	renderSubtitles();
-	saveFile();
 }
 
-function updateStart(i) {
+const updateStartClip = (i) => {
 	subtitlesList[i].start = formatSecondsToTime(myPlayer.currentTime());
-	renderSubtitles();
-	saveFile();
 }
 
-function updateEnd(i) {
+const updateEndClip = (i) => {
 	subtitlesList[i].end = formatSecondsToTime(myPlayer.currentTime());
-	renderSubtitles();
-	saveFile();
 }
 
-function renderSubtitles() {
-	subtitlesContainer.innerHTML = addTemp('addAboveSubtitle(0)');
+function renderSubtitles () {
+	subtitlesContainer.innerHTML = `<div class="mb-4">
+	<button type="button" class="btn btn-primary btn-block btn-add-first mb-1">Add</button>
+	</div>`;
 	const subtitles = subtitlesList.map((subtitle, i) => {
-		return (subTemp(i, subtitle.start, subtitle.end, subtitle.text) + addTemp(`addBelowSubtitle(${i})`));
+		return (subTemp(i, subtitle.start, subtitle.end, subtitle.text) + `<div class="mb-4">
+		<button type="button" class="btn btn-primary btn-block btn-add-insert mb-1">Add</button>
+		</div>`);
 	});
+
 	subtitlesContainer.innerHTML += subtitles.join('');
+
+	saveFile();
+
+	subtitlesContainer.querySelector(".btn-add-first").addEventListener("click", () => {
+		addFirstClip(i);
+		renderSubtitles();
+	})
+
+	document.querySelectorAll(".btn-add-insert").forEach((insertBtn, i) => {
+		insertBtn.addEventListener("click", () => {
+			insertClip(i);
+			renderSubtitles();
+		})
+	});
+
+	document.querySelectorAll(".subtitleContainer").forEach((subtitle, i) => {
+		subtitle.querySelector(".btn-start-clip").addEventListener("click", () => {
+			updateStartClip(i);
+			renderSubtitles();
+		})
+		subtitle.querySelector(".btn-end-clip").addEventListener("click", () => {
+			updateEndClip(i);
+			renderSubtitles();
+		})
+		subtitle.querySelector(".btn-play-clip").addEventListener("click", () => playClip(i))
+		subtitle.querySelector(".btn-delete-clip").addEventListener("click", () => {
+			deleteClip(i);
+			renderSubtitles();
+		})
+	});
 }
+renderSubtitles();
 
 projectName.addEventListener("change", onEditProjectName);
 sbvFile.addEventListener("change", onFileSelected);
 videoLink.addEventListener("change", onVideoLinkSelected);
 mp4File.addEventListener("change", onMP4Selected);
 subtitlesContainer.addEventListener("change", saveFile);
-downloadBtn.addEventListener("click", downloadFile);
+downloadBtn.addEventListener("click", () => {
+	let filename = "subtitles.sbv";
+
+	if (projectName.value !== '') {
+		filename = projectName.value + ".sbv";
+	} else if (sbvFile.files[0] !== undefined) {
+		filename = "(edited) " +  sbvFile.files[0].name;
+	}
+
+	download({content: toSBV(subtitlesList), filename});
+});

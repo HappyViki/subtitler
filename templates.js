@@ -21,15 +21,15 @@ const subTemp = (i, start, end, text) => `<div id="sub-${i}" class="card mb-4 su
         </form>
     </div>
     <div class="mb-3">
-        <button onclick="updateStart(${i})" type="button" class="btn btn-primary mb-1">Update Start</button>
-        <button onclick="updateEnd(${i})" type="button" class="btn btn-primary mb-1">Update End</button>
+        <button type="button" class="btn btn-primary btn-start-clip mb-1">Update Start</button>
+        <button type="button" class="btn btn-primary btn-end-clip mb-1">Update End</button>
     </div>
     <p class="mb-3">
         <textarea name="text" class="form-control f-text" rows="3">${text}</textarea>
     </p>
-    <button onclick="playClip(${i})" type="button" class="btn btn-success mb-1">Play</button>
-    <!--<button type="button" class="btn btn-warning mb-1" disabled>Pause</button>-->
-    <button onclick="deleteClip(${i})" type="button" class="btn btn-danger mb-1">Delete</button>
+    <button type="button" class="btn btn-success btn-play-clip mb-1">Play</button>
+    <!--<button type="button" class="btn btn-warning btn-pause-clip mb-1" disabled>Pause</button>-->
+    <button type="button" class="btn btn-danger btn-delete-clip mb-1">Delete</button>
 </div>
 </div>`;
 
