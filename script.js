@@ -11,22 +11,22 @@ import {
 	updateEndClip,
 } from './util.js';
 
-let items = JSON.parse(localStorage.getItem("items")) || [];
+let projects = JSON.parse(localStorage.getItem("projects")) || [];
 let currentProjectId = localStorage.getItem("currentProjectId") || 0;
-let subtitlesList = items[currentProjectId]?.subtitlesList || [{
+let subtitlesList = projects[currentProjectId]?.subtitlesList || [{
 	start: '0:00:00.000',
 	end: '0:00:05.000',
 	text: ''
 }];
 let myPlayer = videojs('movieVideo');
-projectName.value = items[currentProjectId]?.projectName || '';
+projectName.value = projects[currentProjectId]?.projectName || '';
 
-if (!!items[currentProjectId]?.videoLink) {
-	videoLink.value = items[currentProjectId].videoLink;
+if (!!projects[currentProjectId]?.videoLink) {
+	videoLink.value = projects[currentProjectId].videoLink;
 
 	myPlayer.src({
 		type: 'video/youtube',
-		src: items[currentProjectId].videoLink
+		src: projects[currentProjectId].videoLink
 	});
 }
 
@@ -43,8 +43,8 @@ function onFileSelected(event) {
 }
 
 function onEditProjectName() {	
-	items[currentProjectId] = {...items[currentProjectId], projectName: projectName.value}
-	localStorage.setItem("items", JSON.stringify(items));
+	projects[currentProjectId] = {...projects[currentProjectId], projectName: projectName.value}
+	localStorage.setItem("projects", JSON.stringify(projects));
 }
 
 function onVideoLinkSelected() {	
@@ -53,8 +53,8 @@ function onVideoLinkSelected() {
 		src: videoLink.value
 	});
 
-	items[currentProjectId] = {...items[currentProjectId], videoLink: videoLink.value}
-	localStorage.setItem("items", JSON.stringify(items));
+	projects[currentProjectId] = {...projects[currentProjectId], videoLink: videoLink.value}
+	localStorage.setItem("projects", JSON.stringify(projects));
 }
 
 function onMP4Selected() {
@@ -76,8 +76,8 @@ function saveFile() {
 		return {start, end, text};
 	});
 	
-	items[currentProjectId] = {...items[currentProjectId], subtitlesList}
-	localStorage.setItem("items", JSON.stringify(items));
+	projects[currentProjectId] = {...projects[currentProjectId], subtitlesList}
+	localStorage.setItem("projects", JSON.stringify(projects));
 
 	let oldTracks = myPlayer.remoteTextTracks();
 	let i = oldTracks.length;
