@@ -1,13 +1,16 @@
 import {
 	objectifySubtitles,
-	formatTimeToSeconds,
-	formatSecondsToTime,
 	toWebVTT,
 	toSBV,
 	download,
+	addFirstClip,
+	insertClip,
+	playClip,
+	deleteClip,
+	updateStartClip,
+	updateEndClip,
 } from './util.js';
 
-let playTimeout;
 let items = JSON.parse(localStorage.getItem("items")) || [];
 let currentProjectId = localStorage.getItem("currentProjectId") || 0;
 let subtitlesList = items[currentProjectId]?.subtitlesList || [{
@@ -91,52 +94,6 @@ function saveFile() {
 	});
 }
 
-// Subtitles Utils
-
-const addFirstClip = () => {
-	subtitlesList.unshift({
-		start: '0:00:00.000',
-		end: subtitlesList[0]?.start || '0:00:05.000',
-		text: ''
-	});
-}
-
-const insertClip = (i) => {
-	subtitlesList.splice(i + 1, 0, {
-		start: subtitlesList[i]?.end,
-		end: subtitlesList[i + 1]?.start || subtitlesList[i]?.end || '0:00:00.000',
-		text: ''
-	});
-}
-
-const playClip = (i) => {
-	const start = formatTimeToSeconds(subtitlesList[i].start);
-	const end = formatTimeToSeconds(subtitlesList[i].end)
-
-	myPlayer.currentTime(start);
-	myPlayer.play();
-
-	if (playTimeout) {
-		clearTimeout(playTimeout);
-	}
-
-	playTimeout = setTimeout(function () {
-		myPlayer.pause();
-	}, (end - start) * 1000);
-}
-
-const deleteClip = (i) => {
-	subtitlesList.splice(i, 1);
-}
-
-const updateStartClip = (i) => {
-	subtitlesList[i].start = formatSecondsToTime(myPlayer.currentTime());
-}
-
-const updateEndClip = (i) => {
-	subtitlesList[i].end = formatSecondsToTime(myPlayer.currentTime());
-}
-
 function renderSubtitles () {
 	subtitlesContainer.innerHTML = `<div class="mb-4">
 	<button type="button" class="btn btn-primary btn-block btn-add-first mb-1">Add</button>
@@ -152,29 +109,29 @@ function renderSubtitles () {
 	saveFile();
 
 	subtitlesContainer.querySelector(".btn-add-first").addEventListener("click", () => {
-		addFirstClip(i);
+		addFirstClip(subtitlesList);
 		renderSubtitles();
 	})
 
 	document.querySelectorAll(".btn-add-insert").forEach((insertBtn, i) => {
 		insertBtn.addEventListener("click", () => {
-			insertClip(i);
+			insertClip(i, subtitlesList);
 			renderSubtitles();
 		})
 	});
 
 	document.querySelectorAll(".subtitleContainer").forEach((subtitle, i) => {
 		subtitle.querySelector(".btn-start-clip").addEventListener("click", () => {
-			updateStartClip(i);
+			updateStartClip(i, subtitlesList);
 			renderSubtitles();
 		})
 		subtitle.querySelector(".btn-end-clip").addEventListener("click", () => {
-			updateEndClip(i);
+			updateEndClip(i, subtitlesList);
 			renderSubtitles();
 		})
-		subtitle.querySelector(".btn-play-clip").addEventListener("click", () => playClip(i))
+		subtitle.querySelector(".btn-play-clip").addEventListener("click", () => playClip(i, subtitlesList))
 		subtitle.querySelector(".btn-delete-clip").addEventListener("click", () => {
-			deleteClip(i);
+			deleteClip(i, subtitlesList);
 			renderSubtitles();
 		})
 	});

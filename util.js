@@ -1,3 +1,6 @@
+let myPlayer = videojs('movieVideo');
+let playTimeout;
+
 export const objectifySubtitles = (file) => {
 	return file.split(/\n\n+/).map(subtitle => {
 		const lines = subtitle.split('\n');
@@ -46,4 +49,48 @@ export const download = ({content, mimeType = "text/plain", filename}) => {
 	a.setAttribute('href', url);
 	a.setAttribute('download', filename);
 	a.click();
+}
+
+export const addFirstClip = (subtitlesList) => {
+	subtitlesList.unshift({
+		start: '0:00:00.000',
+		end: subtitlesList[0]?.start || '0:00:05.000',
+		text: ''
+	});
+}
+
+export const insertClip = (i, subtitlesList) => {
+	subtitlesList.splice(i + 1, 0, {
+		start: subtitlesList[i]?.end,
+		end: subtitlesList[i + 1]?.start || subtitlesList[i]?.end || '0:00:00.000',
+		text: ''
+	});
+}
+
+export const playClip = (i, subtitlesList) => {
+	const start = formatTimeToSeconds(subtitlesList[i].start);
+	const end = formatTimeToSeconds(subtitlesList[i].end)
+
+	myPlayer.currentTime(start);
+	myPlayer.play();
+
+	if (playTimeout) {
+		clearTimeout(playTimeout);
+	}
+
+	playTimeout = setTimeout(function () {
+		myPlayer.pause();
+	}, (end - start) * 1000);
+}
+
+export const deleteClip = (i, subtitlesList) => {
+	subtitlesList.splice(i, 1);
+}
+
+export const updateStartClip = (i, subtitlesList) => {
+	subtitlesList[i].start = formatSecondsToTime(myPlayer.currentTime());
+}
+
+export const updateEndClip = (i, subtitlesList) => {
+	subtitlesList[i].end = formatSecondsToTime(myPlayer.currentTime());
 }
