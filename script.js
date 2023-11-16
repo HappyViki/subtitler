@@ -9,6 +9,8 @@ import {
 	deleteClip,
 	updateStartClip,
 	updateEndClip,
+	updateVideoLink,
+	updateMP4File,
 } from './util.js';
 
 let projects = JSON.parse(localStorage.getItem("projects")) || [];
@@ -40,32 +42,6 @@ function onFileSelected(event) {
 	};
 
 	reader.readAsText(selectedFile);
-}
-
-function onEditProjectName() {	
-	projects[currentProjectId] = {...projects[currentProjectId], projectName: projectName.value}
-	localStorage.setItem("projects", JSON.stringify(projects));
-}
-
-function onVideoLinkSelected() {	
-	myPlayer.src({
-		type: 'video/youtube',
-		src: videoLink.value
-	});
-
-	projects[currentProjectId] = {...projects[currentProjectId], videoLink: videoLink.value}
-	localStorage.setItem("projects", JSON.stringify(projects));
-}
-
-function onMP4Selected() {
-	const video = URL.createObjectURL(mp4File.files[0]);
-	myPlayer.src({
-		type: 'video/mp4',
-		src: video
-	});
-	myPlayer.onload = () => {
-		URL.revokeObjectURL(video);
-	};
 }
 
 function saveFile() {
@@ -138,10 +114,9 @@ function renderSubtitles () {
 }
 renderSubtitles();
 
-projectName.addEventListener("change", onEditProjectName);
 sbvFile.addEventListener("change", onFileSelected);
-videoLink.addEventListener("change", onVideoLinkSelected);
-mp4File.addEventListener("change", onMP4Selected);
+videoLink.addEventListener("change", updateVideoLink);
+mp4File.addEventListener("change", updateMP4File);
 subtitlesContainer.addEventListener("change", saveFile);
 downloadBtn.addEventListener("click", () => {
 	let filename = "subtitles.sbv";
@@ -153,4 +128,8 @@ downloadBtn.addEventListener("click", () => {
 	}
 
 	download({content: toSBV(subtitlesList), filename});
+});
+projectName.addEventListener("change", () => {
+	projects[currentProjectId] = {...projects[currentProjectId], projectName: projectName.value}
+	localStorage.setItem("projects", JSON.stringify(projects));
 });

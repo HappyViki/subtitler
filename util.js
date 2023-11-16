@@ -94,3 +94,21 @@ export const updateStartClip = (i, subtitlesList) => {
 export const updateEndClip = (i, subtitlesList) => {
 	subtitlesList[i].end = formatSecondsToTime(myPlayer.currentTime());
 }
+
+export const updateVideoLink = (e) => {	
+	myPlayer.src({
+		type: 'video/youtube',
+		src: e.target.value
+	});
+}
+
+export const updateMP4File = (e) => {
+	const video = URL.createObjectURL(e.target.files[0]);
+	myPlayer.src({
+		type: 'video/mp4',
+		src: video
+	});
+	myPlayer.onload = () => {
+		URL.revokeObjectURL(video);
+	};
+}
