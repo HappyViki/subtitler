@@ -1,5 +1,4 @@
-let items = JSON.parse(localStorage.getItem("items")) || [];
-console.log(items);
+let projects = JSON.parse(localStorage.getItem("projects")) || [];
 
 function editProject(i) {
 	localStorage.setItem("currentProjectId", i);
@@ -8,7 +7,7 @@ function editProject(i) {
 
 function renderRows() {    
 	rowsContainer.innerHTML = "";
-	const rows = items.map((row, i) => {
+	const rows = projects.map((row, i) => {
 		return rowTemp(i, row.projectName, row.videoLink);
 	});
 	rowsContainer.innerHTML += rows.join('');
@@ -17,17 +16,17 @@ function renderRows() {
 renderRows();
 
 addProjectBtn.addEventListener("click", ()=>{
-	items.unshift({
+	projects.unshift({
 		subtitlesList: [],
 		projectName: "",
 		videoLink: ""
 	});
-	localStorage.setItem("items", JSON.stringify(items));	
+	localStorage.setItem("projects", JSON.stringify(projects));	
 	renderRows();
 })
 
 function deleteProject(i) {
-	items.splice(i, 1)
-	localStorage.setItem("items", JSON.stringify(items));	
+	projects.splice(i, 1)
+	localStorage.setItem("projects", JSON.stringify(projects));	
 	renderRows();
 }
