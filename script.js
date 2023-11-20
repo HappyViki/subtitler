@@ -117,8 +117,13 @@ function renderSubtitles () {
 renderSubtitles();
 
 sbvFile.addEventListener("change", onFileSelected);
-videoLink.addEventListener("change", updateVideoLink);
-mp4File.addEventListener("change", updateMP4File);
+videoLink.addEventListener("change", (e) => {
+	updateVideoLink(e);
+
+	projects[currentProjectId] = {...projects[currentProjectId], videoLink: videoLink.value}
+	localStorage.setItem("projects", JSON.stringify(projects));
+});
+// mp4File.addEventListener("change", updateMP4File);
 subtitlesContainer.addEventListener("change", saveFile);
 downloadBtn.addEventListener("click", () => {
 	let filename = "subtitles.sbv";
@@ -132,6 +137,8 @@ downloadBtn.addEventListener("click", () => {
 	download({content: toSBV(subtitlesList), filename});
 });
 projectName.addEventListener("change", () => {
+	console.log("hello");
+	
 	projects[currentProjectId] = {...projects[currentProjectId], projectName: projectName.value}
 	localStorage.setItem("projects", JSON.stringify(projects));
 });
