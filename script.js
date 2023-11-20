@@ -51,6 +51,8 @@ function saveFile() {
 		const text = subtitle.querySelector(".f-text")?.value;
 		return {start, end, text};
 	});
+
+	result.value = toSBV(subtitlesList);
 	
 	projects[currentProjectId] = {...projects[currentProjectId], subtitlesList}
 	localStorage.setItem("projects", JSON.stringify(projects));
