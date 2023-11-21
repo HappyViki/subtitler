@@ -41,10 +41,10 @@ const rowTemp = (i, title, link) => `<div id="row-${i}" class="card d-flex flex-
 <div class="d-flex flex-grow-1 min-width-zero">
     <div class="card-body align-self-center d-flex flex-column flex-md-row justify-content-between min-width-zero align-items-md-center">
         <button onclick="editProject(${i})" type="button" class="list-item-heading btn mb-0 text-primary w-15 w-xs-100">${title || "New Project"}</button>
-        <a class="mb-0 truncate w-40 w-xs-100" href="${link || ""}">
+        <a class="mb-0 truncate w-40 w-xs-100 text-center" href="${link || ""}">
             ${link || "N/A"}
         </a>
-        <div class="w-15 w-xs-100">
+        <div class="w-15 w-xs-100 text-center">
             <span class="badge badge-pill badge-secondary">In Progress</span>
         </div>
         <button onclick="deleteProject(${i})" type="button" class="list-item-heading btn mb-0 text-danger w-15 w-xs-100">Delete</button>
