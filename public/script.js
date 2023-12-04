@@ -11,6 +11,8 @@ import {
 	updateEndClip,
 	updateVideoLink,
 	updateMP4File,
+	formatTimeToSeconds,
+	formatSecondsToTime,
 } from './util.js';
 
 let projects = JSON.parse(localStorage.getItem("projects")) || [];
@@ -22,6 +24,7 @@ let subtitlesList = projects[currentProjectId]?.subtitlesList || [{
 }];
 let myPlayer = videojs('movieVideo');
 projectName.value = projects[currentProjectId]?.projectName || '';
+let playTimeout;
 
 if (!!projects[currentProjectId]?.videoLink) {
 	videoLink.value = projects[currentProjectId].videoLink;
@@ -100,14 +103,14 @@ function renderSubtitles () {
 
 	document.querySelectorAll(".subtitleContainer").forEach((subtitle, i) => {
 		subtitle.querySelector(".btn-start-clip").addEventListener("click", () => {
-			updateStartClip(i, subtitlesList);
+			updateStartClip(i, subtitlesList, formatSecondsToTime(myPlayer.currentTime()));
 			renderSubtitles();
 		})
 		subtitle.querySelector(".btn-end-clip").addEventListener("click", () => {
-			updateEndClip(i, subtitlesList);
+			updateEndClip(i, subtitlesList, formatSecondsToTime(myPlayer.currentTime()));
 			renderSubtitles();
 		})
-		subtitle.querySelector(".btn-play-clip").addEventListener("click", () => playClip(i, subtitlesList))
+		subtitle.querySelector(".btn-play-clip").addEventListener("click", () => playClip(i, subtitlesList, playTimeout, myPlayer))
 		subtitle.querySelector(".btn-delete-clip").addEventListener("click", () => {
 			deleteClip(i, subtitlesList);
 			renderSubtitles();
@@ -118,7 +121,7 @@ renderSubtitles();
 
 sbvFile.addEventListener("change", onFileSelected);
 videoLink.addEventListener("change", (e) => {
-	updateVideoLink(e);
+	updateVideoLink(e.target.value, myPlayer);
 
 	projects[currentProjectId] = {...projects[currentProjectId], videoLink: videoLink.value}
 	localStorage.setItem("projects", JSON.stringify(projects));

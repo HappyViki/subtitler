@@ -1,6 +1,3 @@
-let myPlayer = videojs('movieVideo');
-let playTimeout;
-
 export const objectifySubtitles = (file) => {
 	return file.split(/\n\n+/).map(subtitle => {
 		const lines = subtitle.split('\n');
@@ -67,7 +64,7 @@ export const insertClip = (i, subtitlesList) => {
 	});
 }
 
-export const playClip = (i, subtitlesList) => {
+export const playClip = (i, subtitlesList, playTimeout, myPlayer) => {
 	const start = formatTimeToSeconds(subtitlesList[i].start);
 	const end = formatTimeToSeconds(subtitlesList[i].end)
 
@@ -87,22 +84,22 @@ export const deleteClip = (i, subtitlesList) => {
 	subtitlesList.splice(i, 1);
 }
 
-export const updateStartClip = (i, subtitlesList) => {
-	subtitlesList[i].start = formatSecondsToTime(myPlayer.currentTime());
+export const updateStartClip = (i, subtitlesList, startTime) => {
+	subtitlesList[i].start = startTime;
 }
 
-export const updateEndClip = (i, subtitlesList) => {
-	subtitlesList[i].end = formatSecondsToTime(myPlayer.currentTime());
+export const updateEndClip = (i, subtitlesList, endTime) => {
+	subtitlesList[i].end = endTime;
 }
 
-export const updateVideoLink = (e) => {	
+export const updateVideoLink = (link, myPlayer) => {	
 	myPlayer.src({
 		type: 'video/youtube',
-		src: e.target.value
+		src: link
 	});
 }
 
-export const updateMP4File = (e) => {
+export const updateMP4File = (myPlayer) => {
 	const video = URL.createObjectURL(e.target.files[0]);
 	myPlayer.src({
 		type: 'video/mp4',
