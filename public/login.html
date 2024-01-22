@@ -35,14 +35,14 @@
                         </div>
                         <div class="form-side">
                             <h6 class="mb-4">Login</h6>
-                            <form id="loginForm" action="" method="POST">
+                            <form id="loginForm" action="/login" method="POST">
                                 <label class="form-group has-float-label mb-4">
-                                    <input class="form-control" />
-                                    <span>E-mail</span>
+                                    <input class="form-control" name="username" />
+                                    <span>Username</span>
                                 </label>
 
                                 <label class="form-group has-float-label mb-4">
-                                    <input class="form-control" type="password" placeholder="" />
+                                    <input class="form-control" type="password" name="password" />
                                     <span>Password</span>
                                 </label>
                                 <div class="d-flex justify-content-between align-items-center">
@@ -60,12 +60,6 @@
     <script src="js/vendor/bootstrap.bundle.min.js"></script>
     <script src="js/dore.script.js"></script>
     <script src="js/scripts.js"></script>
-    <script>
-        loginForm.addEventListener("submit", (e) => {
-            e.preventDefault();
-            window.location.href = "index.html";
-        })
-    </script>
 </body>
 
 </html>

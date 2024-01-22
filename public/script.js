@@ -15,6 +15,15 @@ import {
 	formatSecondsToTime,
 } from './util.js';
 
+const render = async () => {
+	const response = await fetch("/user");
+	const data = await response.json();
+	console.log(data);
+
+	username.innerText = data.user.username;
+}
+render();
+
 let projects = JSON.parse(localStorage.getItem("projects")) || [];
 let currentProjectId = localStorage.getItem("currentProjectId") || 0;
 let subtitlesList = projects[currentProjectId]?.subtitlesList || [{
